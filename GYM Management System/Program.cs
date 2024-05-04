@@ -1,4 +1,7 @@
 
+using GYM_Management_System.Context;
+using Microsoft.EntityFrameworkCore;
+
 namespace GYM_Management_System
 {
     public class Program
@@ -13,6 +16,9 @@ namespace GYM_Management_System
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            var ConnectionString = builder.Configuration.GetConnectionString("con1");
+            builder.Services.AddDbContext<ApplicationContext>(a => a.UseSqlServer(ConnectionString));
 
             var app = builder.Build();
 
