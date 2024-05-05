@@ -1,4 +1,5 @@
 ﻿using GYM_Management_System.Context;
+using GYM_Management_System.DTOS;
 using GYM_Management_System.DTOS.Members;
 using GYM_Management_System.Models;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,6 @@ namespace GYM_Management_System.Controllers.MembersController
         {
             _context = context;
         }
-
 
         [HttpGet]
         public IActionResult GetAllMembers()
@@ -112,12 +112,14 @@ namespace GYM_Management_System.Controllers.MembersController
             var trainer = _context.Trainers.FirstOrDefault(t => t.Name == NewMember.TrainerName);
             if (trainer == null)
             {
-                return BadRequest("Trainer not found");
+                return BadRequest(new Response { Status = "Error", Message = "Trainer not found" });
+
             }
             var classes = _context.Classes.Where(c => NewMember.ClassNames.Contains(c.ClassName)).ToList();
             if (classes.Count != NewMember.ClassNames.Count)
             {
-                return BadRequest("One or more classes not found");
+                return BadRequest(new Response { Status = "Error", Message = "One or more classes not found" });
+
             }
 
             var member = new Members
@@ -135,9 +137,9 @@ namespace GYM_Management_System.Controllers.MembersController
             };
             _context.Members.Add(member);
             _context.SaveChanges();
-            return Ok("New Member added successfully");
-        }
+            return Ok(new Response { Status = "Success", Message = " New Member added successfully" });
 
+        }
 
         [HttpPut("{id}")]
         public IActionResult UpdateMember(int id, UpdateMemberDto updatedMemberDto)
@@ -146,7 +148,8 @@ namespace GYM_Management_System.Controllers.MembersController
 
             if (member == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Member not found!" });
+
             }
 
             member.Name = updatedMemberDto.Name;
@@ -160,7 +163,8 @@ namespace GYM_Management_System.Controllers.MembersController
 
             _context.SaveChanges();
 
-            return Ok("Member updated successfully");
+            return Ok(new Response { Status = "Success", Message = " Member updated successfully" });
+
         }
 
         [HttpPut("{id}")]
@@ -170,14 +174,16 @@ namespace GYM_Management_System.Controllers.MembersController
 
             if (member == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Member not found!" });
+
             }
 
             var trainer = _context.Trainers.FirstOrDefault(t => t.Id == updatedMemberDto.TrainerId);
 
             if (trainer == null)
             {
-                return BadRequest("Trainer not found");
+                return NotFound(new Response { Status = "Error", Message = "Trainer not found!" });
+
             }
 
             member.Name = updatedMemberDto.Name;
@@ -193,7 +199,8 @@ namespace GYM_Management_System.Controllers.MembersController
 
             _context.SaveChanges();
 
-            return Ok("Member updated successfully");
+            return Ok(new Response { Status = "Success", Message = "Member updated successfully" });
+
         }
 
         [HttpDelete("{id}")]
@@ -203,16 +210,17 @@ namespace GYM_Management_System.Controllers.MembersController
 
             if (member == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Member not found!" });
+
             }
 
             _context.Members.Remove(member);
 
             _context.SaveChanges();
 
-            return Ok("Member deleted successfully");
-        }
+            return Ok(new Response { Status = "Success", Message = "Member deleted successfully" });
 
+        }
 
     }
 }

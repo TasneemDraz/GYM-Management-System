@@ -1,4 +1,5 @@
 ﻿using GYM_Management_System.Context;
+using GYM_Management_System.DTOS;
 using GYM_Management_System.DTOS.Members;
 using GYM_Management_System.DTOS.Trainers;
 using GYM_Management_System.Models;
@@ -107,20 +108,20 @@ namespace GYM_Management_System.Controllers.TrainersController
             return Ok(trainerDto);
         }
 
-
-
         [HttpPost]
         public IActionResult AddNewTrainer(AddNewTrainerDto NewTrainer)
         {
             var member = _context.Members.Where(m=> NewTrainer.MembersName.Contains(m.Name)).ToList();
             if (member == null)
             {
-                return BadRequest("One or more Members not found");
+                return BadRequest(new Response { Status = "Error", Message = "One or more Members not found" });
+
             }
             var classes = _context.Classes.Where(c => NewTrainer.Classes.Contains(c.ClassName)).ToList();
             if (classes.Count != NewTrainer.Classes.Count)
             {
-                return BadRequest("One or more classes not found");
+                return BadRequest(new Response { Status = "Error", Message = "One or more classes not found" });
+
             }
 
             var trainer = new Trainers
@@ -139,10 +140,9 @@ namespace GYM_Management_System.Controllers.TrainersController
             };
             _context.Trainers.Add(trainer);
             _context.SaveChanges();
-            return Ok("New Trainer added successfully");
+            return Ok(new Response { Status = "Success", Message = "New Trainer added successfully" });
+
         }
-
-
 
         [HttpPut("{id}")]
         public IActionResult UpdateTrainer(int id, UpdateTrainerDto updatedTrainerDto)
@@ -151,7 +151,8 @@ namespace GYM_Management_System.Controllers.TrainersController
 
             if (trainer == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Trainer not found!" });
+
             }
 
             trainer.Name = updatedTrainerDto.Name;
@@ -166,10 +167,11 @@ namespace GYM_Management_System.Controllers.TrainersController
 
             _context.SaveChanges();
 
-            return Ok("Trainer updated successfully");
+            return Ok(new Response { Status = "Success", Message = "Trainer updated successfully" });
+
         }
 
-    
+
         [HttpDelete("{id}")]
         public IActionResult DeleteTrainer(int id)
         {
@@ -180,18 +182,17 @@ namespace GYM_Management_System.Controllers.TrainersController
 
             if (trainer == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Trainer not found!" });
+
             }
 
-            // Remove all associated members
             _context.Members.RemoveRange(trainer.Members);
-
-            // Remove all associated classes
             _context.Classes.RemoveRange(trainer.Classes);
             _context.Trainers.Remove(trainer);
             _context.SaveChanges();
 
-            return Ok("Trainer and associated data deleted successfully");
+            return Ok(new Response { Status = "Success", Message = "Trainer and associated data deleted successfully" });
+
         }
 
 

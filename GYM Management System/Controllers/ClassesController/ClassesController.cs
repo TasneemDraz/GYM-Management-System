@@ -1,4 +1,5 @@
 ﻿using GYM_Management_System.Context;
+using GYM_Management_System.DTOS;
 using GYM_Management_System.DTOS.Classes;
 using GYM_Management_System.DTOS.Members;
 using GYM_Management_System.Models;
@@ -102,21 +103,21 @@ namespace GYM_Management_System.Controllers.ClassesController
             return Ok(classesDto);
         }
 
-
-
         [HttpPost]
         public IActionResult AddNewClasses(AddNewClassesDto newClass)
         {
             var trainer = _context.Trainers.FirstOrDefault(t => t.Name == newClass.TrainerName);
             if (trainer == null)
             {
-                return BadRequest("Trainer not found");
+                return BadRequest(new Response { Status = "Error", Message = "Trainer not found" });
+
             }
 
             var members = _context.Members.Where(m => newClass.MemberName.Contains(m.Name)).ToList();
             if (members.Count != newClass.MemberName.Count)
             {
-                return BadRequest("One or more members not found");
+                return BadRequest(new Response { Status = "Error", Message = "One or more members not found" });
+
             }
 
             var classes = new Classes
@@ -134,9 +135,9 @@ namespace GYM_Management_System.Controllers.ClassesController
             _context.Classes.Add(classes);
             _context.SaveChanges();
 
-            return Ok("New class added successfully");
-        }
+            return Ok(new Response { Status = "Success", Message = "New class added successfully" });
 
+        }
 
         [HttpPut("{id}")]
         public IActionResult UpdateMember(int id, UpdateClassesDto updatedClassesDto)
@@ -145,7 +146,7 @@ namespace GYM_Management_System.Controllers.ClassesController
 
             if (classes == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Classes not found!" });
             }
             classes.ClassName = updatedClassesDto.ClassName;
             classes.Duration = updatedClassesDto.Duration;
@@ -158,9 +159,9 @@ namespace GYM_Management_System.Controllers.ClassesController
 
             _context.SaveChanges();
 
-            return Ok("class updated successfully");
-        }
+            return Ok(new Response { Status = "Success", Message = "class updated successfully" });
 
+        }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteMember(int id)
@@ -169,14 +170,15 @@ namespace GYM_Management_System.Controllers.ClassesController
 
             if (classes == null)
             {
-                return NotFound();
+                return NotFound(new Response { Status = "Error", Message = "Classes not found!" });
             }
 
             _context.Classes.Remove(classes);
 
             _context.SaveChanges();
 
-            return Ok("Classes deleted successfully");
+            return Ok(new Response { Status = "Success", Message = " Classes deleted successfully" });
+
         }
     }
 }
